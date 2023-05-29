@@ -29,9 +29,14 @@ func main() {
 		log.Fatal("Invalid end block:", err)
 	}
 
+	if endBlock < startBlock {
+		log.Fatal("End block must be larger than start block")
+	}
+
 	fmt.Println("RPC Endpoint:", rpcEndpoint)
 	fmt.Println("Start block:", startBlock)
 	fmt.Println("End block:", endBlock)
+	fmt.Println()
 
 	client, err := rpc.Dial(rpcEndpoint)
 	if err != nil {
@@ -39,7 +44,7 @@ func main() {
 	}
 
 	for i := startBlock; i <= endBlock; i++ {
-		blockNumber := fmt.Sprintf("0x%x", i)
+		blockNumber := fmt.Sprintf("0x%x", i) // Convert block number to hexadecimal string
 
 		var block map[string]interface{}
 		err := client.Call(&block, "eth_getBlockByNumber", blockNumber, true)
@@ -47,7 +52,27 @@ func main() {
 			log.Fatal("Error retrieving block", i, ":", err)
 		}
 
-		fmt.Println("Block", i, ":", block)
+		transactions, ok := block["transactions"].([]interface{})
+
+		fmt.Println("Block", i, "Information:")
+		fmt.Println("  Block Hash:", block["hash"])
+		fmt.Println("  Parent Hash:", block["parentHash"])
+
+		if !ok || len(transactions) == 0 {
+			fmt.Println("  No transactions in this block")
+		} else {
+			fmt.Println("  Transactions:")
+			for _, tx := range transactions {
+				txData := tx.(map[string]interface{})
+				fmt.Println("    Transaction Hash:", txData["hash"])
+				fmt.Println("    From:", txData["from"])
+				fmt.Println("    To:", txData["to"])
+				fmt.Println("    Value:", txData["value"])
+				fmt.Println()
+			}
+		}
+
+		fmt.Println()
 	}
 
 }
