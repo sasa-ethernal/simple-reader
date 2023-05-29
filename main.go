@@ -30,7 +30,7 @@ func main() {
 	}
 
 	if endBlock < startBlock {
-		log.Fatal("End block must be larger than start block")
+		log.Fatal("End block must be larger or equal to the start block")
 	}
 
 	fmt.Println("RPC Endpoint:", rpcEndpoint)
@@ -68,11 +68,9 @@ func main() {
 				fmt.Println("    From:", txData["from"])
 				fmt.Println("    To:", txData["to"])
 				fmt.Println("    Value:", txData["value"])
-				fmt.Println()
 			}
 		}
 
 		fmt.Println()
 	}
-
 }
